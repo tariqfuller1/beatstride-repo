@@ -1,0 +1,23 @@
+/* Starter stylesheet. There is very little here on purpose — almost
+   everything you see in this game gets drawn onto the canvas by JavaScript,
+   not styled by CSS. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #07061a;
+  color: #f4f1ff;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  overflow: hidden;          /* no scrollbars; the game fills the window */
+}
+
+#game {
+  position: fixed;
+  inset: 0;                  /* shorthand for top/right/bottom/left: 0 */
+  width: 100%;
+  height: 100%;
+  display: block;            /* kills the few stray pixels below an inline element */
+  touch-action: none;        /* stop a phone treating a tap as a scroll gesture */
+}
