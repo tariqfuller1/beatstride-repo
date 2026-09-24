@@ -3,27 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beatstride (learning build)</title>
+<title>Beatstride</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <canvas id="game"></canvas>
 
-<!--
-  Script order matters here, and it will matter more as you add files.
-
-  These are plain <script> tags, not modules, so every file shares one
-  global scope: anything one file defines, the next one can see. The catch
-  is that code which *runs immediately* can only use things already defined
-  above it. main.js is the only file that runs anything on load, so it
-  always goes last.
--->
 
 <script src="js/util.js"></script>
 <script src="js/stage.js"></script>
 <script src="js/state.js"></script>
 <script src="js/chart.js"></script>
+<script src="js/input.js"></script> 
+<script src="js/game.js"></script>
 <script src="js/render.js"></script>
 <script src="js/main.js"></script>
 

@@ -15,5 +15,12 @@ const G={
     laneHeld:[0,0], 
     t:0,
     pps:600,
-    approach: 1.5
+    approach: 1.5,
+    combo: 0,
+    maxCombo:0,
+    hp: 100,
+    counts : {perfect:0,great:0,good:0,miss:0},
+    jumpV:0,
+    jump:0,
+    stomp:0,
 };

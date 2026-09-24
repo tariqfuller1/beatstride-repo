@@ -48,7 +48,8 @@ function drawHitZone(){
 
 function drawRunner(){
     const L = layout();
-    const y = L.roadY + L.r;
+    const lift = clamp(G.jump,0,1.25) * (L.roadY - L.skyY) * 0.86;
+    const y = L.roadY + L.r - lift;
 
     cx.save();
     cx.translate(L.hitX,y);

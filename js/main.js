@@ -5,6 +5,14 @@ let lastTs = 0;
 
 function update(dt){
     G.t += dt;
+    sweepMisses();
+
+    G.jumpV -= 14*dt;
+    G.jump += G.jumpV*dt;
+
+    if (G.jump < 0) {G.jump = 0;G.jumpV = 0;}
+
+    G.stomp = Math.max(0,G.stomp - dt * 5)
 }
 
 function gameNow(){
@@ -25,6 +33,10 @@ function startRun(){
     G.jIdx = 0
     G.t = 0
     G.running = true
+
+    G.combo = 0; G.maxCombo = 0; G.hp = 100;
+    G.counts = {perfect:0,great:0,good:0,miss:0};
+    G.jump= 0; G.jumpV = 0; G.stomp = 0;
 }
 
 
