@@ -21,3 +21,13 @@ html, body {
   display: block;            /* kills the few stray pixels below an inline element */
   touch-action: none;        /* stop a phone treating a tap as a scroll gesture */
 }
+
+
+#ui{
+  position:fixed;
+  z-index: 2;
+  top:12px; left:50%;
+  transform: translateX(-50%);
+  display:flex; gap: 8px;
+}
+

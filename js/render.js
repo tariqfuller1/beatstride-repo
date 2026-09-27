@@ -51,6 +51,7 @@ function drawRunner(){
     const lift = clamp(G.jump,0,1.25) * (L.roadY - L.skyY) * 0.86;
     const y = L.roadY + L.r - lift;
 
+
     cx.save();
     cx.translate(L.hitX,y);
 
@@ -108,9 +109,31 @@ function drawNotes(){
         if(x>VW+140) break;
 
         if(x<-160) continue;
-
+ 
         drawNote(nt,x,nt.lane === LANE_SKY? L.skyY : L.roadY, L.r);
     }
+}
+
+function drawHUD(){
+    const acc = G.weightJudged > 0 ? (G.weightEarned / G.weightJudged) * 100 : 100;
+
+    cx.fillStyle = "#f4f1ff";
+    cx.font = "700 " + Math.round(clamp(VH * 0.042, 18, 34 )) + "px system-ui";
+    cx.textAlign = "left";
+    cx.fillText(Math.round(G.score).toLocaleString(),16,40);
+
+    cx.font = "500 13px system-ui";
+    cx.fillStyle = "#a79fd4";
+    cx.fillText(acc.toFixed(2) + "%",16,40);
+
+    if (G.combo >= 3){
+        const L = layout();
+        cx.textAlign = "center"
+        cx.fillStyle = "#ffe24d";
+        cx.font = "700 " + Math.round(clamp(VH * 0.07,26,60)) + "px system-ui";
+        cx.fillText(String(G.combo), L.hitX, L.skyY - L.r * 2.4);
+    }
+    cx.textAlign = "left";
 }
 
 function draw(){
@@ -118,4 +141,5 @@ function draw(){
     drawHitZone();
     drawNotes();
     drawRunner();
+    drawHUD();
 }

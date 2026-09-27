@@ -38,8 +38,14 @@ function judgeHit(nt,d){
     G.combo++;
     if (G.combo > G.maxCombo) G.maxCombo = G.combo;
 
+    const factor = res === "perfect" ? 1 :res === "great" ? 0.7 : 0.35;
+    G.weightEarned += factor;
+    G.weightJudged += 1;
+    G.score += G.unit * factor * (1 + Math.min(G.combo,100) /400);
 
-    if (nt.lane === LANE_SKY) g.jumpV = 5.3;
+
+
+    if (nt.lane === LANE_SKY) G.jumpV = 6.3;
     else G.stomp = 1;
 }
 
@@ -49,6 +55,7 @@ function judgeMiss(nt){
     G.counts.miss++;
     G.combo = 0;
     G.hp -=5;
+    G.weightJudged += 1;
 }
 
 function sweepMisses(){
@@ -59,4 +66,26 @@ function sweepMisses(){
         G.jIdx++;
     }
 
+}
+
+
+function setupScoring(){
+    G.weightTotal = 0;
+    for (const n of G.notes) G.weightTotal += 1;
+    G.weightTotal = Math.max(1,G.weightTotal);
+    G.unit = 1000000 / G.weightTotal;
+    G.weightEarned = 0;
+    G.weightJudged = 0;
+    G.score = 0;
+}
+
+function rankFor(acc){
+
+    if (acc >= 98) return "SSS";
+    if (acc >= 95) return "SS";
+    if (acc >= 90) return "S";
+    if (acc >= 80) return "A";
+    if (acc >= 70) return "B";
+    if (acc >= 60) return "C";
+    return "D";
 }
