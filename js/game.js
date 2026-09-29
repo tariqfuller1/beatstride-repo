@@ -26,27 +26,33 @@ function tryHit(lane){
 
 
 
-function judgeHit(nt,d){
-    let res;
-    if (d<=W_PERF) res = "perfect";
-    else if (d<=W_GREAT) res = "great";
-    else res = "good";
+function judgeHit(nt, d) {
+  let res;
+  if (d <= W_PERF) res = "perfect";
+  else if (d <= W_GREAT) res = "great";
+  else res = "good";
 
-    nt.judged = true;
-    nt.res = res;
-    G.counts[res]++;
-    G.combo++;
-    if (G.combo > G.maxCombo) G.maxCombo = G.combo;
+  nt.judged = true;
+  nt.res = res;
 
-    const factor = res === "perfect" ? 1 :res === "great" ? 0.7 : 0.35;
-    G.weightEarned += factor;
-    G.weightJudged += 1;
-    G.score += G.unit * factor * (1 + Math.min(G.combo,100) /400);
+  if (nt.type === "hold") {       // <-- NEW
+    nt.hitAt = gameNow();         // <-- NEW
+    nt.held = 0;                  // <-- NEW
+    nt.broke = false;             // <-- NEW
+    G.holds.push(nt);             // <-- NEW
+  }                               // <-- NEW
 
+  G.counts[res]++;
+  G.combo++;
+  if (G.combo > G.maxCombo) G.maxCombo = G.combo;
 
+  const factor = res === "perfect" ? 1 : res === "great" ? 0.7 : 0.35;
+  G.weightEarned += factor;
+  G.weightJudged += 1;
+  G.score += G.unit * factor * (1 + Math.min(G.combo, 100) / 400);
 
-    if (nt.lane === LANE_SKY) G.jumpV = 6.3;
-    else G.stomp = 1;
+  if (nt.lane === LANE_SKY) G.jumpV = 5.3;
+  else G.stomp = 1;
 }
 
 function judgeMiss(nt){
@@ -71,7 +77,7 @@ function sweepMisses(){
 
 function setupScoring(){
     G.weightTotal = 0;
-    for (const n of G.notes) G.weightTotal += 1;
+      for (const n of G.notes) G.weightTotal += n.type === "hold" ? 1.5 : 1;
     G.weightTotal = Math.max(1,G.weightTotal);
     G.unit = 1000000 / G.weightTotal;
     G.weightEarned = 0;
@@ -88,4 +94,38 @@ function rankFor(acc){
     if (acc >= 70) return "B";
     if (acc >= 60) return "C";
     return "D";
+}
+
+const HOLD_GRACE = 0.09;   
+
+
+function updateHolds(dt) {
+  const now = gameNow();
+
+  for (let i = G.holds.length - 1; i >= 0; i--) {
+    const nt = G.holds[i];
+    const end = nt.t + nt.dur;
+    const on = G.laneHeld[nt.lane] > 0;
+
+    if (!nt.broke) {
+      if (on) {
+        nt.held += dt;
+        G.score += G.unit * 0.5 * (dt / Math.max(0.1, nt.dur));
+      } else if (now > nt.hitAt + HOLD_GRACE && now < end - 0.05) {
+        nt.broke = true;          // let go too early
+        G.combo = 0;
+      }
+    }
+
+    if (now > end) {
+      const frac = clamp(nt.held / Math.max(0.001, nt.dur), 0, 1);
+      G.weightEarned += 0.5 * frac;
+      G.weightJudged += 0.5;
+      if (frac > 0.9) {
+        G.combo++;
+        if (G.combo > G.maxCombo) G.maxCombo = G.combo;
+      }
+      G.holds.splice(i, 1);
+    }
+  }
 }

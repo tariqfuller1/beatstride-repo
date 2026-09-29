@@ -6,6 +6,7 @@ let lastTs = 0;
 function update(dt){
     G.t += dt;
     sweepMisses();
+    updateHolds(dt);
 
     G.jumpV -= 14*dt;
     G.jump += G.jumpV*dt;
@@ -38,6 +39,7 @@ function startRun(){
     G.combo = 0; G.maxCombo = 0; G.hp = 100;
     G.counts = {perfect:0,great:0,good:0,miss:0};
     G.jump= 0; G.jumpV = 0; G.stomp = 0;
+    G.holds = [];
     setupScoring();
 }
 

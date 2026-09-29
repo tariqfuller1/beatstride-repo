@@ -23,4 +23,5 @@ const G={
     jumpV:0,
     jump:0,
     stomp:0,
+    holds : []
 };

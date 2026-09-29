@@ -76,6 +76,13 @@ function drawNote(nt, x, y, r){
     cx.save()
     cx.translate(x,y);
 
+    if (nt.type === "hold") {                                  // <-- NEW
+    const w = Math.max(4, nt.dur * G.pps);                   // <-- NEW
+    cx.fillStyle = nt.lane === LANE_SKY                      // <-- NEW
+      ? "rgba(65,230,255,0.6)" : "rgba(255,176,46,0.6)";     // <-- NEW
+    cx.fillRect(0, -r * 0.43, w, r * 0.86);                  // <-- NEW
+  }
+
     if(nt.lane == LANE_SKY){
         cx.rotate(Math.PI / 4)
         cx.fillStyle = "#41e6ff";
