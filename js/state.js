@@ -23,5 +23,9 @@ const G={
     jumpV:0,
     jump:0,
     stomp:0,
+    punch: 0,
+    upper: 0,
+    expr:"neutral",
+    exprT: 0,
     holds : []
 };

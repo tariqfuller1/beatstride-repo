@@ -56,3 +56,10 @@ function makeFFT(n) {
     }
   };
 }
+
+
+function roundRect(cx, x, y, w, h ,r){
+  cx.beginPath();
+  if(cx.roundRect) cx.roundRect(x,y,w,h,r);
+  else cx.rect(x,y,w,h);
+}

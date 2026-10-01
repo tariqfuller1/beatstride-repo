@@ -51,8 +51,12 @@ function judgeHit(nt, d) {
   G.weightJudged += 1;
   G.score += G.unit * factor * (1 + Math.min(G.combo, 100) / 400);
 
-  if (nt.lane === LANE_SKY) G.jumpV = 5.3;
-  else G.stomp = 1;
+  if (nt.lane === LANE_SKY) {G.jumpV = 5.3; G.upper = 1;}
+  else {G.stomp = 1; G.punch = 1;}
+
+
+  setExpr(res === "perfect" ? "perfect" : "good",
+          res === "perfect" ? 0.45 : 0.3);
 }
 
 function judgeMiss(nt){
@@ -62,6 +66,7 @@ function judgeMiss(nt){
     G.combo = 0;
     G.hp -=5;
     G.weightJudged += 1;
+    setExpr("miss", 0.7);
 }
 
 function sweepMisses(){

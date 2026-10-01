@@ -13,7 +13,12 @@ function update(dt){
 
     if (G.jump < 0) {G.jump = 0;G.jumpV = 0;}
 
-    G.stomp = Math.max(0,G.stomp - dt * 5)
+    G.stomp = Math.max(0,G.stomp - dt * 5);
+    G.punch = Math.max(0, G.punch - dt * 5.5);
+    G.upper = Math.max(0, G.upper - dt * 4.5); 
+
+    G.exprT -= dt; 
+    if (G.exprT <= 0) G.expr = "neutral";
 }
 
 function gameNow(){
