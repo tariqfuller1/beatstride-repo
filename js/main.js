@@ -12,6 +12,7 @@ function update(dt){
     G.jump += G.jumpV*dt;
 
     if (G.jump < 0) {G.jump = 0;G.jumpV = 0;}
+    if (G.jump > 1.25) {G.jump = 1.25; G.jumpV = Math.min(G.jumpV, 0);}
 
     G.stomp = Math.max(0,G.stomp - dt * 5);
     G.punch = Math.max(0, G.punch - dt * 5.5);
@@ -44,6 +45,8 @@ function startRun(){
     G.combo = 0; G.maxCombo = 0; G.hp = 100;
     G.counts = {perfect:0,great:0,good:0,miss:0};
     G.jump= 0; G.jumpV = 0; G.stomp = 0;
+    G.punch = 0; G.upper = 0;
+    G.expr = "neutral"; G.exprT = 0;
     G.holds = [];
     setupScoring();
 }
@@ -69,5 +72,8 @@ $("startBtn").addEventListener("click", () => {
     startRun();
 })
 
+$("skinPick").addEventListener("input", (e) => {  
+  SKIN.body = e.target.value;                  
+}); 
 resize();
 requestAnimationFrame(frame);

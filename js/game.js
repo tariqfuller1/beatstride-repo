@@ -35,12 +35,12 @@ function judgeHit(nt, d) {
   nt.judged = true;
   nt.res = res;
 
-  if (nt.type === "hold") {       // <-- NEW
-    nt.hitAt = gameNow();         // <-- NEW
-    nt.held = 0;                  // <-- NEW
-    nt.broke = false;             // <-- NEW
-    G.holds.push(nt);             // <-- NEW
-  }                               // <-- NEW
+  if (nt.type === "hold") {      
+    nt.hitAt = gameNow();        
+    nt.held = 0;                  
+    nt.broke = false;             
+    G.holds.push(nt);            
+  }                            
 
   G.counts[res]++;
   G.combo++;

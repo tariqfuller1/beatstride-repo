@@ -45,31 +45,114 @@ function drawHitZone(){
     }
 }
 
-
-function drawRunner(){
-    const L = layout();
-    const lift = clamp(G.jump,0,1.25) * (L.roadY - L.skyY) * 0.86;
-    const y = L.roadY + L.r - lift;
-
-
-    cx.save();
-    cx.translate(L.hitX,y);
-
-    cx.fillStyle="#fff4e6";
-    cx.strokeStyle="#180a2e";
-    cx.lineWidth=2.4;
-    cx.beginPath()
-    cx.arc(0,-34,9,0,Math.PI*2);
-    cx.fill()
-    cx.stroke();
+function trail(path, amt, rgb) {
+  if (amt <= 0.03) return;
+  cx.save();
+  cx.fillStyle = "rgb(" + rgb + ")";
+  for (let i = 1; i <= 4; i++) {
+    const f = i / 5;
+    const [tx, ty] = path(amt * f);      // where the hand was a moment ago
+    cx.globalAlpha = 0.5 * amt * f;
     cx.beginPath();
-    cx.rect(-8,-24,16,17);
+    cx.arc(tx, ty, 6 * (0.5 + f * 0.5), 0, Math.PI * 2);
     cx.fill();
-    cx.stroke();
+  }
+  cx.restore();
+}
 
-    cx.restore();
+/* Where each hand sits for a given amount of its swing, 0 = resting.
+ * The trail reuses these, so the streak follows the hand's real path. */
+function roadHand(p) {
+  return [lerp(15, 26, p), lerp(-16, -10, p)];
+}
+function skyHand(u) {
+  // bows out to the left before rising, so the arc clears the head
+  return [lerp(-15, -13, u) - Math.sin(u * Math.PI) * 8, lerp(-16, -54, u)];
+}
 
+function hand(x, y) {
+  cx.beginPath();
+  cx.arc(x, y, 6, 0, Math.PI * 2);
+  cx.fill();
+  cx.stroke();
+}
 
+function drawRobot() {
+const L=layout();
+  const lift   = clamp(G.jump, 0, 1.25) * (L.roadY - L.skyY) * 0.86;
+  const y      = L.roadY + L.r - lift;
+  const s      = L.r / 22;
+  // impact widens and flattens; rising stretches it tall
+  const squash = 1 + G.stomp * 0.15 - clamp(G.jump, 0, 1.25) * 0.05;
+
+  // shadow stays on the road and shrinks as the robot rises
+  cx.save();
+  cx.globalAlpha = clamp(0.34 - G.jump * 0.24, 0.04, 0.34);
+  cx.fillStyle = "#000";
+  cx.beginPath();
+  cx.ellipse(L.hitX, L.roadY + L.r + 3, 19 * s * (1 - clamp(G.jump, 0, 1.25) * 0.3), 4.5 * s, 0, 0, Math.PI * 2);
+  cx.fill();
+  cx.restore();
+
+  cx.save();
+  cx.translate(L.hitX, y);
+  cx.scale(s * squash, s / squash);
+  cx.translate(0, Math.sin(G.t * 3.1) * 0.7 - clamp(G.jump, 0, 1.25) * 1.2);
+
+  // where the hands are this frame: right jabs the road, left swings up
+  const pr = Math.sin(clamp(G.punch, 0, 1) * Math.PI / 2);
+  const up = Math.sin(clamp(G.upper, 0, 1) * Math.PI / 2);
+  const [rx, ry] = roadHand(pr);
+  const [lx, ly] = skyHand(up);
+
+  // trails first, so they come out from behind the robot
+  trail(skyHand,  up, "65,230,255");    // sky  — cyan
+  trail(roadHand, pr, "255,176,46");    // road — amber
+
+  cx.strokeStyle = SKIN.ink; cx.lineWidth = 2.4; cx.lineJoin = "round";
+
+  // feet — tucked up under the body so the outlines merge
+  cx.fillStyle = SKIN.body;
+  roundRect(cx, -8.5, -8, 7, 7, 3); cx.fill(); cx.stroke();
+  roundRect(cx,  1.5, -8, 7, 7, 3); cx.fill(); cx.stroke();
+
+  // body, then a slightly darker chest panel
+  cx.fillStyle = SKIN.body;
+  roundRect(cx, -11, -28, 22, 22, 6); cx.fill(); cx.stroke();
+  cx.fillStyle = "rgba(0,0,0,0.10)";
+  roundRect(cx, -6, -23, 12, 9.5, 3.2); cx.fill();
+
+  // antenna, set off-centre so the robot doesn't read as a symmetrical blob
+  cx.strokeStyle = SKIN.ink; cx.lineWidth = 1.9; cx.lineCap = "round";
+  cx.beginPath(); cx.moveTo(-5, -49); cx.lineTo(-7.5, -56); cx.stroke();
+  cx.fillStyle = SKIN.accent;
+  cx.beginPath(); cx.arc(-8, -58, 2.7, 0, Math.PI * 2); cx.fill();
+  cx.lineWidth = 1.6; cx.stroke();
+
+  // head — overlaps the body by one unit, so there is no neck seam
+  cx.fillStyle = SKIN.body; cx.lineWidth = 2.4;
+  roundRect(cx, -13, -50, 26, 23, 9); cx.fill(); cx.stroke();
+
+  // side bolts
+  cx.fillStyle = SKIN.body;
+  for (const d of [-1, 1]) {
+    cx.beginPath(); cx.arc(d * 13.6, -38, 2.2, 0, Math.PI * 2); cx.fill(); cx.stroke();
+  }
+
+  // face plate, then whichever expression is current
+  cx.fillStyle = "rgba(0,0,0,0.10)";
+  roundRect(cx, -10, -46.5, 20, 17, 7); cx.fill();
+  cx.save();
+  cx.translate(0, -38);
+  (FACES[G.expr] || FACES.neutral)(cx);
+  cx.restore();
+
+  // hands last, on top of everything
+  cx.fillStyle = SKIN.body; cx.strokeStyle = SKIN.ink; cx.lineWidth = 2.3;
+  hand(lx, ly);
+  hand(rx, ry);
+
+  cx.restore();
 }
 
 function drawNote(nt, x, y, r){
@@ -147,6 +230,6 @@ function draw(){
     drawBackground();
     drawHitZone();
     drawNotes();
-    drawRunner();
+    drawRobot();
     drawHUD();
 }
